@@ -1,6 +1,5 @@
 package com.example.simple_viewmodel
 
-import android.widget.Button
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +15,29 @@ import kotlin.random.Random
 
 @Composable
 fun MainScreen() {
-    //2 una vez en su propio fichero, creamos el núcleo visual en la MainScreen
-    //(en este caso una columna que ocupa toda la pantalla, con un padding general,
-    //que contiene un botón que se encargará de lanzar el dado y un texto que
-    //refleje el número del dado).
+    //5 elevamos la variable number a un nivel superior (hoisting)
+    var number by remember { mutableStateOf(0) }
+    //6 instanciamos una nueva funcion composable que contendrá la lógica del lanzamiento de dado,
+    //pasándole la variable de estado por parámetro.
+
+    //8 esto nos trae de nuevo aquí, a introducir un segundo parámetro (lambda) cuyo funcionamiento
+    //dicta que el valor del primer parámetro (number) será sustituido por lo que devuelva la
+    //función lambda.
+    LanzadorDados(number, {number = it})
+
+
+}
+
+//7 creamos la función con el contenido que ya conocemos. NOTA: los parámetros que reciben
+//las funciones son INMUTABLES. Eso significa que deberemos pasarle una lambda que pueda
+//modificar ese parámetro.
+
+//9 esto nos obliga a declararlo (el segundo parámetro lambda) en la definición de la
+//función LanzadorDados. A esta lambda la llamaremos changeNumber y, recordemos, es la
+//encargada de modificar el valor contenido en number.
+@Composable
+fun LanzadorDados(number: Int, changeNumber : (Int)->Unit) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,19 +45,14 @@ fun MainScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        //4 aquí implementamos el estado, ya que, recordemos, la vista no se recompondrá
-        //salvo que haya un cambio de estado (no todas las variables son de estado);
-        //para lograrlo, declaramos la variable 'number' y la inicializamos con delegación
-        //(by) con remember de mutablestateof y un valor inicial. La delegación y el by
-        //hace que number adquiera el tipo de su contenido, en este caso un int, en lugar
-        //de su 'tipo propio' que es el mutableState. En caso de no usar delegación, se
-        //deberá poner .value al final de la variable para lograr esto mismo.
-        var number by remember{ mutableStateOf(0) }
-                Button(onClick = {
-            //3 dispuesta la parte visual, procedemos a trabajar en la lógica dentro
-            //del botón, en este caso. Lo que nos interesa es que este genere un
-            //número de entre 1 y 6.
-            number = (Random.nextInt(1,7))
+
+        Button(onClick = {
+            //10 debido a que hemos añadido la lambda como parámetro, esta debe sustituir al
+            //valor number previo, ya que lo que estamos haciendo es asignarle en el onClick
+            //de button la lambda que hemos definido arriba, en los parámetros de la función
+            //LanzadorDado; y en esa declaración conveníamos que la lambda changeNumber recibe
+            //un Int, que es exactamente lo que recibe aquí, el nextInt de la librería Random.
+            changeNumber(Random.nextInt(1, 7))
         }) {
             Text(text = "LANZAR DADO", fontSize = 40.sp)
         }
