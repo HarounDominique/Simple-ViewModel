@@ -15,28 +15,18 @@ import kotlin.random.Random
 
 @Composable
 fun MainScreen() {
-    //5 elevamos la variable number a un nivel superior (hoisting)
-    var number by remember { mutableStateOf(0) }
-    //6 instanciamos una nueva funcion composable que contendrá la lógica del lanzamiento de dado,
-    //pasándole la variable de estado por parámetro.
 
-    //8 esto nos trae de nuevo aquí, a introducir un segundo parámetro (lambda) cuyo funcionamiento
-    //dicta que el valor del primer parámetro (number) será sustituido por lo que devuelva la
-    //función lambda.
-    LanzadorDados(number, {number = it})
+    var number by remember { mutableStateOf(0) }
+    //11 el siguente paso puede ser definir completamente el funcionamiento de esta lambda
+    //14 y, finalmente, pegamos ese mismo contenido en la propia lambda en el argumento de la llamada a la función
+    //LanzarDados; por lo que su funcionamiento queda totalmente definido aquí.
+    LanzadorDados(number, {number = Random.nextInt(1, 7)})
 
 
 }
-
-//7 creamos la función con el contenido que ya conocemos. NOTA: los parámetros que reciben
-//las funciones son INMUTABLES. Eso significa que deberemos pasarle una lambda que pueda
-//modificar ese parámetro.
-
-//9 esto nos obliga a declararlo (el segundo parámetro lambda) en la definición de la
-//función LanzadorDados. A esta lambda la llamaremos changeNumber y, recordemos, es la
-//encargada de modificar el valor contenido en number.
+//12 para ello se puede, en primer lugar, eliminar el Int de la lambda dentro del parámetro de la función LanzadorDados.
 @Composable
-fun LanzadorDados(number: Int, changeNumber : (Int)->Unit) {
+fun LanzadorDados(number: Int, changeNumber : ()->Unit) {
 
     Column(
         modifier = Modifier
@@ -47,12 +37,9 @@ fun LanzadorDados(number: Int, changeNumber : (Int)->Unit) {
     ) {
 
         Button(onClick = {
-            //10 debido a que hemos añadido la lambda como parámetro, esta debe sustituir al
-            //valor number previo, ya que lo que estamos haciendo es asignarle en el onClick
-            //de button la lambda que hemos definido arriba, en los parámetros de la función
-            //LanzadorDado; y en esa declaración conveníamos que la lambda changeNumber recibe
-            //un Int, que es exactamente lo que recibe aquí, el nextInt de la librería Random.
-            changeNumber(Random.nextInt(1, 7))
+            //13 hecho eso, retiraremos el contenido que implicaba ese Int que acabamos de eliminar,
+            // pero esta vez en la definición de la función, no de su llamada.
+            changeNumber()
         }) {
             Text(text = "LANZAR DADO", fontSize = 40.sp)
         }
